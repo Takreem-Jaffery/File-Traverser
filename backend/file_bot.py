@@ -212,12 +212,20 @@ def cmd_check(args):
 # --------------------------------------------------------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description="Natural-looking daily GitHub commit scheduler")
-    parser.add_argument("--config", default=str(BASE_DIR / "config.yaml"), help="Path to config.yaml")
+    # Shared so --config works whether it's given before or after the
+    # subcommand (e.g. both `commit_bot.py --config x.yaml plan` and
+    # `commit_bot.py plan --config x.yaml` work).
+    config_parser = argparse.ArgumentParser(add_help=False)
+    config_parser.add_argument("--config", default=str(BASE_DIR / "config.yaml"), help="Path to config.yaml")
+
+    parser = argparse.ArgumentParser(
+        description="Natural-looking daily GitHub commit scheduler",
+        parents=[config_parser],
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("plan", help="Generate today's commit schedule").set_defaults(func=cmd_plan)
-    sub.add_parser("check", help="Execute any due commits from today's plan").set_defaults(func=cmd_check)
+    sub.add_parser("plan", parents=[config_parser], help="Generate today's commit schedule").set_defaults(func=cmd_plan)
+    sub.add_parser("check", parents=[config_parser], help="Execute any due commits from today's plan").set_defaults(func=cmd_check)
 
     args = parser.parse_args()
     args.func(args)
