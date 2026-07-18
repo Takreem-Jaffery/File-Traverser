@@ -1,4 +1,4 @@
-name: try-bot
+name: file-bot
 on:
   schedule:
     - cron: "1 0 * * *"     # plan, once a day just after midnight UTC
