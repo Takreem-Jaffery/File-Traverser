@@ -1,0 +1,38 @@
+# Copy this file to config.yaml and edit as needed.
+
+# Path to your local clone of the target repo
+repo_path: "/absolute/path/to/your/repo"
+
+# File that gets touched/appended to on each commit
+commit_file: "activity.log"
+
+# Branch to push to
+branch: "main"
+
+# Only needed when running in GitHub Actions (no global git identity there).
+# git_user_email MUST match a verified email on your GitHub account, or the
+# commits won't count on your contribution graph.
+git_user_name: "Your Name"
+git_user_email: "you@example.com"
+
+# Probability (0.0 - 1.0) that any given day is skipped entirely
+skip_probability: 0.15
+
+# How many days per calendar week should get multiple commits
+multi_commit_days_per_week: 1
+
+# Range of commit counts on a multi-commit day (inclusive)
+multi_commit_min: 2
+multi_commit_max: 10
+
+# Commits will only be scheduled between these hours (24h, local time)
+active_hour_start: 8
+active_hour_end: 23
+
+# Rotated randomly for commit messages
+commit_messages:
+  - "Update activity log"
+  - "Minor tweaks"
+  - "Small update"
+  - "Chore: routine update"
+  - "Housekeeping"

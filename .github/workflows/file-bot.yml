@@ -1,0 +1,43 @@
+name: commit-bot
+on:
+  schedule:
+    - cron: "1 0 * * *"     # plan, once a day just after midnight UTC
+    - cron: "*/15 * * * *"  # check, every 15 minutes
+  workflow_dispatch: {}      # lets you trigger it manually to test
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - run: pip install -r commit-bot/requirements.txt
+
+      - name: Restore bot state
+        uses: actions/cache/restore@v4
+        with:
+          path: commit-bot/state
+          key: bot-state-${{ github.run_id }}
+          restore-keys: |
+            bot-state-
+
+      - name: Build today's plan (once a day, or on manual run)
+        if: github.event.schedule == '1 0 * * *' || github.event_name == 'workflow_dispatch'
+        run: python commit-bot/commit_bot.py plan --config commit-bot/config.yaml
+
+      - name: Fire any due commits
+        run: python commit-bot/commit_bot.py check --config commit-bot/config.yaml
+
+      - name: Save bot state
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: commit-bot/state
+          key: bot-state-${{ github.run_id }}
