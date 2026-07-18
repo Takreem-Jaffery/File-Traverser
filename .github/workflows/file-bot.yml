@@ -1,4 +1,4 @@
-name: commit-bot
+name: try-bot
 on:
   schedule:
     - cron: "1 0 * * *"     # plan, once a day just after midnight UTC
@@ -18,26 +18,26 @@ jobs:
         with:
           python-version: "3.x"
 
-      - run: pip install -r commit-bot/requirements.txt
+      - run: pip install -r backend/requirements.txt
 
       - name: Restore bot state
         uses: actions/cache/restore@v4
         with:
-          path: commit-bot/state
+          path: backend/state
           key: bot-state-${{ github.run_id }}
           restore-keys: |
             bot-state-
 
       - name: Build today's plan (once a day, or on manual run)
         if: github.event.schedule == '1 0 * * *' || github.event_name == 'workflow_dispatch'
-        run: python commit-bot/commit_bot.py plan --config commit-bot/config.yaml
+        run: python backend/file_bot.py plan --config backend/config.yaml
 
       - name: Fire any due commits
-        run: python commit-bot/commit_bot.py check --config commit-bot/config.yaml
+        run: python backend/file_bot.py check --config backend/config.yaml
 
       - name: Save bot state
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: commit-bot/state
+          path: backend/state
           key: bot-state-${{ github.run_id }}
